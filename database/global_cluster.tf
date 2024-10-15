@@ -62,10 +62,10 @@ resource "aws_security_group" "db_sg_secondary" {
 
   ingress {
     description = "Allow MySQL traffic from VPC"
-    from_port   = 5432
-    to_port     = 5432
+    from_port   = 3306
+    to_port     = 3306
     protocol    = "tcp"
-    cidr_blocks = [var.secondary_vpc_cidr]
+    cidr_blocks = ["10.1.0.0/16"]
   }
 
   egress {

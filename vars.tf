@@ -100,9 +100,7 @@ variable "preferred_backup_window" {
   default     = "07:00-09:00"
 }
 
-
-
-# VPC variables
+# Secondary VPC variables
 
 variable "secondary_public_subnet_cidrs" {
   description = "List of CIDR blocks for secondary public subnets"

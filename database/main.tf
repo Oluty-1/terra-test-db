@@ -31,41 +31,38 @@ resource "aws_rds_cluster" "aurora" {
 }
 
 resource "aws_rds_cluster_instance" "aurora_instances" {
-  count               = var.db_instance_count
   identifier          = "${var.project_name}-${var.environment}-aurora-instance-${count.index + 1}"
   cluster_identifier  = aws_rds_cluster.aurora.id
-  instance_class      = "db.t3.micro"  # Changed to t3.micro
+  instance_class      = "db.t3.micro"
   engine              = aws_rds_cluster.aurora.engine
   engine_version      = aws_rds_cluster.aurora.engine_version
   publicly_accessible = false
 
   tags = {
-    Name        = "${var.project_name}-${var.environment}-aurora-instance-${count.index + 1}"
-    Environment = var.environment
+    Name        = "${var.project_name}-aurora-instance"
   }
 }
 
 resource "aws_db_subnet_group" "aurora" {
-  name       = "${var.project_name}-${var.environment}-aurora-subnet-group"
+  name       = "${var.project_name}-aurora-subnet-group"
   subnet_ids = var.subnet_ids
 
   tags = {
-    Name        = "${var.project_name}-${var.environment}-aurora-subnet-group"
-    Environment = var.environment
+    Name        = "${var.project_name}-aurora-subnet-group"
   }
 }
 
 resource "aws_security_group" "db_sg" {
-  name        = "${var.project_name}-${var.environment}-aurora-sg"
+  name        = "${var.project_name}-aurora-sg"
   description = "Security group for Aurora cluster"
   vpc_id      = var.vpc_id
 
   ingress {
     description = "Allow MySQL traffic from VPC"
-    from_port   = 5432
-    to_port     = 5432
+    from_port   = 3306
+    to_port     = 3306
     protocol    = "tcp"
-    cidr_blocks = [var.vpc_cidr]
+    cidr_blocks = ["10.0.0.0/16"]
   }
 
   egress {
