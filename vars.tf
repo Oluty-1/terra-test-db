@@ -1,73 +1,71 @@
 # vars.tf
 
-# General variables
 variable "project_name" {
   description = "The name of the project"
-  type        = string
-  default     = "high-availability-db"
+  default     = "terra"
 }
 
 variable "environment" {
-  description = "The deployment environment (e.g., dev, staging, prod)"
-  type        = string
+  description = "The deployment environment"
   default     = "dev"
 }
 
-# Region variables
 variable "primary_region" {
   description = "The primary AWS region for deployment"
-  type        = string
-  default     = "us-west-2"
+  default     = "us-west-1"
+}
+
+variable "ZONE1" {
+  description = "The AWS region"
+  default     = "us-west-1a"
+}
+
+variable "ZONE2" {
+  description = "The AWS region"
+  default     = "us-west-1b"
 }
 
 variable "secondary_region" {
   description = "The secondary AWS region for disaster recovery"
-  type        = string
-  default     = "us-east-1"
+  default     = "us-west-2"
 }
 
 # VPC variables
 variable "primary_vpc_cidr" {
   description = "The CIDR block for the primary VPC"
-  type        = string
   default     = "10.0.0.0/16"
 }
 
 variable "secondary_vpc_cidr" {
   description = "The CIDR block for the secondary VPC"
-  type        = string
   default     = "10.1.0.0/16"
 }
 
 # Database variables
 variable "db_name" {
   description = "The name of the database"
-  type        = string
-  default     = "mydb"
+  default     = "terradb"
 }
 
 variable "db_username" {
   description = "The master username for the database"
-  type        = string
   default     = "admin"
 }
 
 variable "db_password" {
   description = "The master password for the database"
-  type        = string
   sensitive   = true
 }
 
 variable "db_instance_class" {
   description = "The instance class for the database"
-  type        = string
-  default     = "db.r5.large"
+  default     = "db.t3.micro"
 }
 
 variable "db_engine_version" {
-  description = "The engine version for the Aurora PostgreSQL database"
+  description = "The engine version for the Aurora MySQL database"
   type        = string
-  default     = "13.7"
+  default     = "5.7.mysql_aurora.2.10.2"
 }
 
 # Autoscaling variables
@@ -105,29 +103,6 @@ variable "preferred_backup_window" {
 
 
 # VPC variables
-variable "primary_vpc_cidr" {
-  description = "The CIDR block for the primary VPC"
-  type        = string
-  default     = "10.0.0.0/16"
-}
-
-variable "secondary_vpc_cidr" {
-  description = "The CIDR block for the secondary VPC"
-  type        = string
-  default     = "10.1.0.0/16"
-}
-
-variable "primary_public_subnet_cidrs" {
-  description = "List of CIDR blocks for primary public subnets"
-  type        = list(string)
-  default     = ["10.0.1.0/24", "10.0.2.0/24"]
-}
-
-variable "primary_private_subnet_cidrs" {
-  description = "List of CIDR blocks for primary private subnets"
-  type        = list(string)
-  default     = ["10.0.10.0/24", "10.0.20.0/24"]
-}
 
 variable "secondary_public_subnet_cidrs" {
   description = "List of CIDR blocks for secondary public subnets"

@@ -2,7 +2,7 @@
 
 resource "aws_rds_global_cluster" "global" {
   global_cluster_identifier = "${var.project_name}-${var.environment}-global-aurora-cluster"
-  engine                    = "aurora-postgresql"
+  engine                    = "aurora-mysql"
   engine_version            = var.db_engine_version
   database_name             = var.db_name
   storage_encrypted         = true
@@ -61,7 +61,7 @@ resource "aws_security_group" "db_sg_secondary" {
   vpc_id      = var.secondary_vpc_id
 
   ingress {
-    description = "Allow PostgreSQL traffic from VPC"
+    description = "Allow MySQL traffic from VPC"
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"

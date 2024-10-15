@@ -1,6 +1,6 @@
 # vpc/main.tf
 
-resource "aws_vpc" "main" {
+resource "aws_vpc" "vtest" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
   enable_dns_support   = true
@@ -11,76 +11,78 @@ resource "aws_vpc" "main" {
   }
 }
 
-resource "aws_internet_gateway" "main" {
-  vpc_id = aws_vpc.main.id
+resource "aws_subnet" "vtest-public-1" {
+  vpc_id                  = aws_vpc.vtest.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = var.ZONE1
+  map_public_ip_on_launch = "true"
 
   tags = {
-    Name        = "${var.project_name}-${var.environment}-igw"
-    Environment = var.environment
+    Name        = "vtest-public-1"
   }
 }
 
-resource "aws_subnet" "public" {
-  count                   = length(var.public_subnet_cidrs)
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = var.public_subnet_cidrs[count.index]
-  availability_zone       = data.aws_availability_zones.available.names[count.index]
-  map_public_ip_on_launch = true
+resource "aws_subnet" "vtest-public-2" {
+  vpc_id                  = aws_vpc.vtest.id
+  cidr_block              = "10.0.2.0/24"
+  availability_zone       = var.ZONE2
+  map_public_ip_on_launch = "true"
 
   tags = {
-    Name        = "${var.project_name}-${var.environment}-public-subnet-${count.index + 1}"
-    Environment = var.environment
+    Name        = "vtest-public-2"
   }
 }
 
-resource "aws_subnet" "private" {
-  count             = length(var.private_subnet_cidrs)
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = var.private_subnet_cidrs[count.index]
-  availability_zone = data.aws_availability_zones.available.names[count.index]
+resource "aws_subnet" "vtest-private-1" {
+  vpc_id            = aws_vpc.vtest.id
+  cidr_block        = "10.0.3.0/24"
+  availability_zone = var.ZONE1
+  map_public_ip_on_launch = "true"
 
   tags = {
-    Name        = "${var.project_name}-${var.environment}-private-subnet-${count.index + 1}"
-    Environment = var.environment
+    Name        = "vtest-private-1"
   }
 }
 
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.main.id
+resource "aws_subnet" "vtest-private-2" {
+  vpc_id            = aws_vpc.vtest.id
+  cidr_block        = "10.0.4.0/24"
+  availability_zone = var.ZONE2
+  map_public_ip_on_launch = "true"
+
+  tags = {
+    Name        = "vtest-private-2"
+  }
+}
+
+resource "aws_internet_gateway" "vtest-IGW" {
+  vpc_id = aws_vpc.vtest.id
+
+  tags = {
+    Name        = "vtest-IGW"
+  }
+}
+
+resource "aws_route_table" "vtest-public-RT" {
+  vpc_id = aws_vpc.vtest.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.main.id
+    gateway_id = aws_internet_gateway.vtest-IGW.id
   }
 
   tags = {
-    Name        = "${var.project_name}-${var.environment}-public-rt"
-    Environment = var.environment
+    Name        = "vtest-public-RT"
   }
 }
 
-resource "aws_route_table" "private" {
-  count  = length(var.private_subnet_cidrs)
-  vpc_id = aws_vpc.main.id
 
-  tags = {
-    Name        = "${var.project_name}-${var.environment}-private-rt-${count.index + 1}"
-    Environment = var.environment
-  }
+resource "aws_route_table_association" "vtest-public-1-a" {
+  subnet_id      = aws_subnet.vtest-public-1.id
+  route_table_id = aws_route_table.vtest-public-RT.id
 }
 
-resource "aws_route_table_association" "public" {
-  count          = length(var.public_subnet_cidrs)
-  subnet_id      = aws_subnet.public[count.index].id
-  route_table_id = aws_route_table.public.id
-}
-
-resource "aws_route_table_association" "private" {
-  count          = length(var.private_subnet_cidrs)
-  subnet_id      = aws_subnet.private[count.index].id
-  route_table_id = aws_route_table.private[count.index].id
-}
-
-data "aws_availability_zones" "available" {
-  state = "available"
+resource "aws_route_table_association" "vtest-public-2-a" {
+  subnet_id      = aws_subnet.vtest-public-2.id
+  route_table_id = aws_route_table.vtest-public-RT.id
 }

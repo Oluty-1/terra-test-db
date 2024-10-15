@@ -2,8 +2,8 @@
 
 resource "aws_rds_cluster" "aurora" {
   cluster_identifier      = "${var.project_name}-${var.environment}-aurora-cluster"
-  engine                  = "aurora-postgresql"
-  engine_version          = var.db_engine_version
+  engine                  = "aurora-mysql"
+  engine_version          = "var.db_engine_version"
   availability_zones      = data.aws_availability_zones.available.names
   database_name           = var.db_name
   master_username         = var.db_username
@@ -34,7 +34,7 @@ resource "aws_rds_cluster_instance" "aurora_instances" {
   count               = var.db_instance_count
   identifier          = "${var.project_name}-${var.environment}-aurora-instance-${count.index + 1}"
   cluster_identifier  = aws_rds_cluster.aurora.id
-  instance_class      = var.db_instance_class
+  instance_class      = "db.t3.micro"  # Changed to t3.micro
   engine              = aws_rds_cluster.aurora.engine
   engine_version      = aws_rds_cluster.aurora.engine_version
   publicly_accessible = false
@@ -61,7 +61,7 @@ resource "aws_security_group" "db_sg" {
   vpc_id      = var.vpc_id
 
   ingress {
-    description = "Allow PostgreSQL traffic from VPC"
+    description = "Allow MySQL traffic from VPC"
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
